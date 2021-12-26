@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fundamentos de JavaScript</title>
+    <script src="js/d3.v5.min.js"></script>
+    <script src="codigo.js"></script>
+    <script src="topojson.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+        
+<svg width="1000" height="600"></svg>
+    
+    <script>
+        
+    
+    const svg =d3.select('svg'); 
+    const projecction = d3.geoNaturalEarth1();
+    const pathGenerator = d3.geoPath().projection(projecction);
+    const g = svg.append('g');
+    
+    g.append('path')
+        .attr('class','sphere')
+        .attr('d',pathGenerator({type: 'Sphere'}));
+        
+    svg.call(d3.zoom().on('zoom',()=>{
+        g.attr('transform', d3.event.transform);
+    }));
+    d3.json("countries-110m.json")
+        .then(data => {
+            const countries = topojson.feature(data,data.objects.countries);
+            console.log(countries);
+            g.selectAll('path').data(countries.features)
+            .enter().append('path')
+                .attr('class','country')
+                .attr('d',pathGenerator)
+            .append('title')
+                .text(d=> d.properties.name);
+    });
+        
+    </script>
+    
+</body>
+</html>
